@@ -727,6 +727,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
   margin-top: 8px;
 }
 
+/* an odd number of spreads leaves a lone card on the last row — give it
+   the full width rather than half a row with a gap beside it */
+.spread:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
 .spread {
   position: relative;
   display: block;

@@ -68,8 +68,9 @@ const S = {
   stage: "intro",
   shuffled: false,
   summary: null,
-  locked: false
+  locked: false,
 };
+
 
 const shape = () => Spread.SPREADS[S.spread] || Spread.SPREADS.three;
 const emptySlots = () => Array.from({ length: shape().count }, () => null);
@@ -828,7 +829,7 @@ el.askForm.addEventListener("submit", e => {
     S.slots = emptySlots();
     S.summary = null;
     S.locked = false;
-    el.seal.hidden = true;
+      el.seal.hidden = true;
   }
 
   closeModal(el.scrimAsk);

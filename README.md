@@ -36,9 +36,15 @@ draw over, since the old slots no longer exist.
 | Spread | Cards | Reads as |
 |---|---|---|
 | **Three card** | 3 | Persona, obstacle, solution — woven into one movement |
+| **Release & Retain** | 2 | What is ready to be set down against what is worth carrying |
+| **Asset & Hindrance** | 2 | What is already working for you against what is working against it |
 | **One card** | 1 | A single, direct answer with nothing to soften it |
 | **Yes or no** | 1 | A verdict: upright is yes, reversed is no, with its reasoning |
-| **Daily tarot** | 1 | The posture for the day rather than a forecast |
+
+The two-card spreads are read as a pair held against each other rather than as
+a sequence, so they get their own closing prose — neither the three-card weave
+nor the single card's flat statement.
+
 
 ## The rail
 

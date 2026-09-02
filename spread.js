@@ -39,16 +39,25 @@ const Spread = (() => {
         { label: "The verdict", role: "which way the deck falls, and why" }
       ]
     },
-    daily: {
-      id: "daily", name: "Daily tarot", count: 1,
-      blurb: "What today is asking of you",
+    release: {
+      id: "release", name: "Release & Retain", count: 2,
+      blurb: "What to put down, what to keep",
       positions: [
-        { label: "Today", role: "the shape of the day in front of you" }
+        { label: "Release", role: "what is ready to be set down" },
+        { label: "Retain",  role: "what is worth carrying forward" }
+      ]
+    },
+    asset: {
+      id: "asset", name: "Asset & Hindrance", count: 2,
+      blurb: "What is helping, what is in the way",
+      positions: [
+        { label: "Asset",     role: "what is already working in your favour" },
+        { label: "Hindrance", role: "what is working against it" }
       ]
     }
   };
 
-  const ORDER = ["three", "one", "yesno", "daily"];
+  const ORDER = ["three", "release", "asset", "one", "yesno"];
 
   const POSITIONS = SPREADS.three.positions;
 
@@ -182,6 +191,29 @@ const Spread = (() => {
         `Stop ${pivot}. ${a.name} and ${c.name} together suggest the real turning point is not more ` +
         `effort but a change of grip — ${clause(c.lens)}.`;
 
+    } else if (shape.count === 2) {
+      /* two cards held against each other, not read in sequence */
+      if (shape.id === "release") {
+        overall =
+          `${when}${who} the deck answers in two. ${a.name} is what is ready to be ` +
+          `set down — ${clause(a.takeaway)}. ${b.name} is what deserves to come with ` +
+          `you: ${clause(b.takeaway)}. The pair is an inventory rather than a verdict — ` +
+          `not everything heavy is worth carrying, and not everything light is worth keeping.`;
+        // a colon, not a dash: several lenses already contain an em-dash,
+        // and two in one sentence reads as a fragment
+        takeaway =
+          `Stop ${pivot}. Put down ${a.plain}, keep ${b.plain}: ${clause(b.lens)}.`;
+      } else {
+        overall =
+          `${when}${who} ${a.name} is what is already working for you — ${clause(a.takeaway)}. ` +
+          `${b.name} is what is working against it: ${clause(b.takeaway)}. Held side by side ` +
+          `they say the obstacle is real but not the whole picture; you are not starting ` +
+          `from nothing, and the thing in your way is smaller than the thing in your hand.`;
+        takeaway =
+          `Stop ${pivot}. ${a.name} is the leverage, ${b.name} the friction. ` +
+          `${cap(clause(a.lens))}.`;
+      }
+
     } else if (shape.id === "yesno") {
       /* one card, and it has to actually commit to an answer */
       const yes = !a.reversed;
@@ -194,13 +226,6 @@ const Spread = (() => {
           : "a no that is closer to “not like this” than to “never”"}.`;
       takeaway =
         `${verdict} — but stop ${pivot}. ${cap(clause(a.lens))}.`;
-
-    } else if (shape.id === "daily") {
-      overall =
-        `Today arrives as ${a.name}. ${a.detail} ` +
-        `Held against ${year || "the year"}${who ? " and where you are in it" : ""}, ` +
-        `this is less a forecast than a posture — the way to stand while the day happens to you.`;
-      takeaway = `${a.takeaway} Stop ${pivot}.`;
 
     } else {
       /* a single, direct read */
