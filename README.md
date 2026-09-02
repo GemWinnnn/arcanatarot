@@ -38,7 +38,22 @@ draw over, since the old slots no longer exist.
 | **Three card** | 3 | Persona, obstacle, solution — woven into one movement |
 | **One card** | 1 | A single, direct answer with nothing to soften it |
 | **Yes or no** | 1 | A verdict: upright is yes, reversed is no, with its reasoning |
-| **Daily tarot** | 1 | The posture for the day rather than a forecast |
+| **Daily tarot** | 1 | The posture for the day rather than a forecast — and the only spread that expires |
+
+### The daily reset
+
+A daily draw is stamped with the **local** calendar date it was made. On load,
+a stamp older than today clears the reading, returns the card to the deck and
+says so. Local, not UTC: a card pulled at 11pm turns over an hour later at the
+reader's midnight, not at London's.
+
+No server is involved, and none is needed — the draw carries its own date, and
+a different date on load is all "a new day" means. What a backend would add is
+not the reset but its *enforcement*: stopping someone redrawing by clearing
+site data or opening a private window, and carrying a reading between devices.
+For a personal ritual neither is worth an account system.
+
+The other three spreads never expire; they persist until you clear them.
 
 ## The rail
 

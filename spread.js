@@ -41,7 +41,7 @@ const Spread = (() => {
     },
     daily: {
       id: "daily", name: "Daily tarot", count: 1,
-      blurb: "What today is asking of you",
+      blurb: "What today asks — resets each day",
       positions: [
         { label: "Today", role: "the shape of the day in front of you" }
       ]
