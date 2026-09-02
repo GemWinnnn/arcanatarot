@@ -104,7 +104,7 @@ const Oracle = (() => {
 
   /* --------------------------------------------------------- cache */
 
-  const CACHE_KEY = "critters-tarot.readings.v1";
+  const CACHE_KEY = "arcana.readings.v1";
   const MAX_ENTRIES = 240;
 
   function readCache() {

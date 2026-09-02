@@ -19,14 +19,23 @@
 
 const Sound = (() => {
 
-  const KEY = "critters.sound.v1";
+  const KEY = "arcana.sound.v1";
 
   let ctx = null, master = null, fx = null, music = null, verb = null;
   let noise = null;
   let droneNodes = [], bellTimer = null, playing = false;
   let on = true;
 
-  try { const v = localStorage.getItem(KEY); if (v !== null) on = v === "1"; } catch (e) {}
+  try {
+    // carry the preference over from the room's former name
+    const old = localStorage.getItem("critters.sound.v1");
+    if (old !== null && localStorage.getItem(KEY) === null) {
+      localStorage.setItem(KEY, old);
+      localStorage.removeItem("critters.sound.v1");
+    }
+    const v = localStorage.getItem(KEY);
+    if (v !== null) on = v === "1";
+  } catch (e) {}
 
   /* ─── recorded samples ───────────────────────────────────────────
      Fetched at load (no context needed for that) so the bytes are in

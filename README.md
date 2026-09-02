@@ -1,8 +1,8 @@
-# Critters Tarot
+# ArcanaTarot
 
-A working build of the Figma file **critters**
+A three-card tarot reading room. Built from the Figma source
 ([section 165:2321](https://www.figma.com/design/oSG9mJqZU16RU1WjRygP17/critters?node-id=165-2321),
-[homepage 169:28](https://www.figma.com/design/oSG9mJqZU16RU1WjRygP17/critters?node-id=169-28)).
+[homepage 169:28](https://www.figma.com/design/oSG9mJqZU16RU1WjRygP17/critters?node-id=169-28)):
 Homepage, Rename question, Shuffling, Selecting cards, Revealing cards,
 Summary and Clean up — wired into one page under a persistent masthead.
 

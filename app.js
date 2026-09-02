@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------
-   Critters Tarot — the room.
+   ArcanaTarot — the room.
 
    Stages: ask → shuffle → desk (place) → reveal (flip) → summary.
    The summary is a one-way door: once it exists the spread is
@@ -9,7 +9,7 @@
 (() => {
 "use strict";
 
-const KEY = "critters.spread.v1";
+const KEY = "arcana.spread.v1";
 const $  = id => document.getElementById(id);
 
 const el = {
@@ -84,6 +84,16 @@ function save() {
 
 function load() {
   try {
+    // the room was called something else once; carry a reading over rather
+    // than silently dropping it the first time someone returns
+    if (!localStorage.getItem(KEY)) {
+      const old = localStorage.getItem("critters.spread.v1");
+      if (old) {
+        localStorage.setItem(KEY, old);
+        localStorage.removeItem("critters.spread.v1");
+      }
+    }
+
     const raw = localStorage.getItem(KEY);
     if (!raw) return false;
     const d = JSON.parse(raw);
