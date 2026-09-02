@@ -1,8 +1,19 @@
 # Dev-only server — Vercel serves the static files itself
 serve.py
 
-# The previous single-card build, kept in git but not shipped
+# The previous single-card build: kept in git, not shipped
 legacy/
+
+# Art belonging only to that older build. Still in the repo so legacy/
+# runs locally, but never fetched by the live app — 3.6MB of the 10MB
+# payload, so it stays on the ground.
+assets/backdrop.png
+assets/card-back-roses.png
+assets/card-back.svg
+assets/card-frame.webp
+assets/dust-far.svg
+assets/dust-mid.svg
+assets/dust-near.svg
 
 # Local tooling
 .claude/
