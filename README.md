@@ -138,10 +138,14 @@ the desk — for the three-card spread: **Persona** (who you are in the question
 
 Card faces are the 22 `MW_*` exports, renamed to their card ids
 (`assets/cards/death.png`). The card back is `assets/card-back-eye.png` and the
-seal's eye is `assets/seal-eye.png`, both pulled from the Figma file. The eye
-ships as gold foil and is turned white in CSS with `brightness(0) invert(1)`,
-which flattens every colour to black and lifts it to white while leaving the
-alpha channel alone — no second copy of the asset to keep in step.
+seal's eye is `assets/seal-eye-white.png`, both pulled from the Figma file.
+
+The eye ships from Figma as gold foil. It is repainted white as a baked asset
+rather than with a CSS filter, because filters on an SVG `<image>` are
+unreliable in Safari — which would have quietly served the gold original to
+those users. The bake is also 22KB against the gold file's 303KB, since the
+foil texture is what made the original large. `assets/seal-eye.png` stays in
+the repo as the source but is excluded from the deploy.
 
 Only placed cards load a face image — the fan would otherwise pull all 6MB of
 art down to render a row of backs. The deck's buried leaves drop their back art

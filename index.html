@@ -95,8 +95,11 @@
         <path id="sealArc" d="M106.5 24.5a82 82 0 1 1-.01 0" fill="none"/>
       </defs>
       <circle cx="106.5" cy="106.5" r="106.5" fill="var(--ink)"/>
-      <!-- the deck's own eye, held upright while the ring turns -->
-      <image class="seal__eye" href="assets/seal-eye.png" x="41.5" y="68"
+      <!-- the deck's own eye, repainted white and held upright while the
+           ring turns. A baked asset rather than a CSS filter: filters on
+           SVG <image> are unreliable in Safari, which would show the gold
+           original instead. Also 22KB against the gold file's 303KB. -->
+      <image class="seal__eye" href="assets/seal-eye-white.png" x="41.5" y="68"
              width="130" height="75" preserveAspectRatio="xMidYMid meet"/>
       <g class="seal__ring">
         <text class="seal__text">
@@ -109,7 +112,7 @@
 
   <h1 class="question" id="questionRow">
     <span class="question__text" id="questionText"></span>
-    <button class="question__edit" id="btnRenameInline" type="button" aria-label="Rename my question">
+    <button class="question__edit" id="btnRenameInline" type="button" aria-label="Edit your question">
       <svg viewBox="0 0 20 20" aria-hidden="true"><use href="#i-pencil"/></svg>
     </button>
   </h1>
@@ -188,7 +191,7 @@
           <span class="field__err" id="eYear"></span>
         </label>
       </div>
-      <button class="slab slab--wide" id="btnAskGo" type="submit">Rename my question</button>
+      <button class="slab slab--wide" id="btnAskGo" type="submit">Save my question</button>
     </form>
   </div>
 </div>

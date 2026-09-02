@@ -15,6 +15,9 @@ assets/dust-far.svg
 assets/dust-mid.svg
 assets/dust-near.svg
 
+# The gold original of the seal eye; the app ships the white bake
+assets/seal-eye.png
+
 # Local tooling
 .claude/
 .impeccable/

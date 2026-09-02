@@ -216,10 +216,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 .seal__svg { width: 100%; height: 100%; display: block; }
 
-/* the artwork is gold foil; brightness(0) flattens it to black and
-   invert(1) lifts it to white, leaving the alpha channel untouched */
-.seal__eye { filter: brightness(0) invert(1); }
-
 /* a ring that breathes out of the seal a few times when it first appears,
    then stops — enough to catch the eye, not enough to nag */
 .seal::after {
