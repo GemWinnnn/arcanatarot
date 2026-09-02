@@ -36,24 +36,15 @@ draw over, since the old slots no longer exist.
 | Spread | Cards | Reads as |
 |---|---|---|
 | **Three card** | 3 | Persona, obstacle, solution — woven into one movement |
+| **Release & Retain** | 2 | What is ready to be set down against what is worth carrying |
+| **Asset & Hindrance** | 2 | What is already working for you against what is working against it |
 | **One card** | 1 | A single, direct answer with nothing to soften it |
 | **Yes or no** | 1 | A verdict: upright is yes, reversed is no, with its reasoning |
-| **Daily tarot** | 1 | The posture for the day rather than a forecast — and the only spread that expires |
 
-### The daily reset
+The two-card spreads are read as a pair held against each other rather than as
+a sequence, so they get their own closing prose — neither the three-card weave
+nor the single card's flat statement.
 
-A daily draw is stamped with the **local** calendar date it was made. On load,
-a stamp older than today clears the reading, returns the card to the deck and
-says so. Local, not UTC: a card pulled at 11pm turns over an hour later at the
-reader's midnight, not at London's.
-
-No server is involved, and none is needed — the draw carries its own date, and
-a different date on load is all "a new day" means. What a backend would add is
-not the reset but its *enforcement*: stopping someone redrawing by clearing
-site data or opening a private window, and carrying a reading between devices.
-For a personal ritual neither is worth an account system.
-
-The other three spreads never expire; they persist until you clear them.
 
 ## The rail
 

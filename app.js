@@ -24,7 +24,7 @@ const el = {
   readyShuffle: $("btnReadyShuffle"), doneShuffle: $("btnDoneShuffle"),
   slots: $("slots"), fan: $("fan"),
   says: $("deskSays"), lead: $("deskLead"), hint: $("deskHint"), fanCount: $("fanCount"),
-  deckStack: $("deckStack"), deckCount: $("deckCount"), dayNote: $("dayNote"),
+  deckStack: $("deckStack"), deckCount: $("deckCount"),
   spreadPick: $("spreadPick"),
   scrimAsk: $("scrimAsk"), askForm: $("askForm"), spreadsField: $("spreadsField"),
   fQuestion: $("fQuestion"), fBirth: $("fBirth"), fYear: $("fYear"),
@@ -69,37 +69,8 @@ const S = {
   shuffled: false,
   summary: null,
   locked: false,
-  drawnOn: null                 // local date of a daily draw; see freshDay()
 };
 
-/* The local calendar date, not UTC — a reading drawn at 11pm should turn
-   over an hour later, at the reader's midnight, not at London's. */
-function todayKey(d = new Date()) {
-  return d.getFullYear() + "-" +
-         String(d.getMonth() + 1).padStart(2, "0") + "-" +
-         String(d.getDate()).padStart(2, "0");
-}
-
-let dayJustTurned = false;
-
-/* Daily tarot is the one spread that means something about *today*, so it
-   is the one spread that expires. The other three are kept until you
-   clear them yourself. No server involved: the draw carries the date it
-   was made, and a different date on load is all "a new day" means. */
-function freshDay() {
-  if (S.spread !== "daily" || !S.drawnOn) return false;
-  if (S.drawnOn === todayKey()) return false;
-
-  S.slots = emptySlots();
-  S.summary = null;
-  S.locked = false;
-  S.drawnOn = null;
-  S.order = freshOrder();
-  S.shuffled = false;
-  S.stage = "shuffle";
-  dayJustTurned = true;
-  return true;
-}
 
 const shape = () => Spread.SPREADS[S.spread] || Spread.SPREADS.three;
 const emptySlots = () => Array.from({ length: shape().count }, () => null);
@@ -109,10 +80,6 @@ let wipeMode = "clean";         // which button opened the confirm
 /* ─── persistence ──────────────────────────────────────────────── */
 
 function save() {
-  // stamp a daily draw the moment it actually becomes a draw
-  if (S.spread === "daily" && !S.drawnOn && (S.summary || S.slots.some(Boolean))) {
-    S.drawnOn = todayKey();
-  }
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {}
 }
 
@@ -208,7 +175,6 @@ function render() {
   el.stageShuffle.hidden = S.stage !== "shuffle";
   el.stageDesk.hidden    = S.stage !== "desk";
 
-  el.dayNote.hidden = !(dayJustTurned && S.stage === "shuffle");
   if (S.stage === "shuffle") renderRiffle();
   if (S.stage === "desk")  { renderSlots(); renderFan(); }
 
@@ -612,7 +578,6 @@ el.readyShuffle.addEventListener("click", async () => {
 
 el.doneShuffle.addEventListener("click", () => {
   if (!S.shuffled || shuffling) return;
-  dayJustTurned = false;
   S.stage = "desk";
   render();
 });
@@ -653,7 +618,6 @@ function newDraw() {
   S.slots = emptySlots();
   S.summary = null;
   S.locked = false;
-  S.drawnOn = null;
   S.order = freshOrder();
   S.shuffled = false;
   S.stage = "shuffle";
@@ -865,8 +829,7 @@ el.askForm.addEventListener("submit", e => {
     S.slots = emptySlots();
     S.summary = null;
     S.locked = false;
-    S.drawnOn = null;
-    el.seal.hidden = true;
+      el.seal.hidden = true;
   }
 
   closeModal(el.scrimAsk);
@@ -902,7 +865,6 @@ el.deckPick.addEventListener("change", e => {
   S.slots = emptySlots();
   S.summary = null;
   S.locked = false;
-  S.drawnOn = null;
   el.seal.hidden = true;
   if (S.stage === "desk") stopHintCycle();
   render();
@@ -921,7 +883,6 @@ el.wipeYes.addEventListener("click", () => {
   S.slots = emptySlots();
   S.summary = null;
   S.locked = false;
-  S.drawnOn = null;
   el.seal.hidden = true;
 
   if (wipeMode === "restart") {
@@ -958,7 +919,6 @@ if (!load()) {
   if (!S.order?.length) S.order = freshOrder();
   if (!Spread.SPREADS[S.spread]) S.spread = "three";
   if (S.stage === "intro" && S.question) S.stage = "shuffle";
-  if (freshDay()) say("A new day. Yesterday's card has been returned to the deck.");
   // a save written before this spread existed (or under another one) can
   // carry the wrong number of slots — rebuild rather than render a mismatch
   if (S.slots.length !== shape().count) {
