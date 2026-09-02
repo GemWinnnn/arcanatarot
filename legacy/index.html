@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Critters Tarot — Draw One Card</title>
+<meta name="theme-color" content="#0d1327">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alike+Angular&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!--
+THESIS: A reading happens at night, on a table under an open sky. The deck is
+the only lit thing. Refuses the illustrated-scene backdrop that competed with
+its own cards, and the floating text column with no surface under it.
+OWN-WORLD: Drenched midnight plaster (#0d1327–#1d2947), aged gold hairlines,
+ink-bordered frames, warm parchment plates. Every card and every panel is the
+same object: black border, gold rule, arch, sun at the foot.
+STORY: Shuffle, take one card, say what you came to ask, read the answer.
+FIRST VIEWPORT: Night filling the frame, gold dust drifting across it, the
+title in parchment, one stacked deck centred, one gold-ruled button beneath.
+FORM: Framed plate on night ground. Brief-pinned by the user's three references.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+-->
+
+<div class="sky" aria-hidden="true">
+  <div class="sky__plaster"></div>
+  <div class="sky__grain"></div>
+  <div class="sky__dust sky__dust--far"></div>
+  <div class="sky__dust sky__dust--mid"></div>
+  <div class="sky__dust sky__dust--near"></div>
+  <div class="sky__breath sky__breath--a"></div>
+  <div class="sky__breath sky__breath--b"></div>
+  <div class="sky__vignette"></div>
+</div>
+
+<main class="scene" id="scene">
+
+  <div class="stage">
+    <header class="titles" id="titles">
+      <h1 class="title">Select one card.<br>Manifest your intentions</h1>
+      <p class="subtitle" id="subtitle">Hold your question in mind, then shuffle the deck.</p>
+    </header>
+
+    <div class="table" id="table">
+      <div class="glow" id="glow" aria-hidden="true"></div>
+      <div class="deck" id="deck" role="group" aria-label="Tarot deck"></div>
+    </div>
+
+    <div class="controls" id="controls">
+      <button class="btn" id="action" type="button">Shuffle the deck</button>
+    </div>
+  </div>
+
+  <!-- the reading: one framed plate, the drawn card mounted inside it -->
+  <section class="plate" id="plate" aria-live="polite">
+    <div class="plate__frame">
+      <svg class="plate__mark plate__mark--top" viewBox="0 0 24 24" aria-hidden="true"><use href="#spark"/></svg>
+      <svg class="plate__mark plate__mark--bottom" viewBox="0 0 24 24" aria-hidden="true"><use href="#spark"/></svg>
+
+      <div class="plate__mount" id="plateMount" aria-hidden="true"></div>
+
+      <div class="plate__text" id="reading">
+
+        <p class="reading__eyebrow">Your card</p>
+        <h2 class="reading__name" id="readingName"></h2>
+        <p class="reading__orient" id="readingOrient"></p>
+
+        <form class="intent" id="intentForm">
+          <label class="intent__label" for="intentInput">
+            Now name your intention — what did you come here to ask?
+          </label>
+          <textarea class="intent__input" id="intentInput" rows="2" maxlength="220"
+            placeholder="e.g. Should I take the new job?" autocomplete="off"></textarea>
+          <div class="intent__quick" id="intentQuick"></div>
+          <button class="btn" id="askBtn" type="submit">Ask the cards</button>
+        </form>
+
+        <p class="thinking" id="thinking"><span id="thinkingLead">The cards are considering</span><span>.</span><span>.</span><span>.</span></p>
+
+        <div class="answer" id="answer">
+          <p class="answer__asked" id="answerAsked"></p>
+          <div class="answer__meta">
+            <span class="answer__topic" id="answerTopic"></span>
+            <span class="answer__recalled" id="answerRecalled" hidden>Recalled</span>
+          </div>
+          <ul class="reading__keys" id="readingKeys"></ul>
+          <p class="reading__lens" id="readingLens"></p>
+          <p class="reading__body" id="readingBody"></p>
+          <p class="reading__whisper" id="readingWhisper"></p>
+          <p class="reading__closer" id="readingCloser"></p>
+          <div class="answer__actions">
+            <button class="btn btn--ghost" id="askAgain" type="button">Ask something else</button>
+            <button class="btn btn--ghost" id="again" type="button">Draw again</button>
+          </div>
+          <p class="answer__cachenote" id="cacheNote"></p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <!-- four-point sparkle, the deck's own grammar -->
+    <path id="spark" d="M12 0c.9 7.9 3.2 11.1 12 12-8.8.9-11.1 4.1-12 12-.9-7.9-3.2-11.1-12-12 8.8-.9 11.1-4.1 12-12Z"/>
+  </defs>
+</svg>
+
+<script src="cards.js"></script>
+<script src="oracle.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

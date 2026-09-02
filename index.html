@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Critters Tarot — Three Card Spread</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ─── shared iconography ─────────────────────────────────────── -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <path id="i-spark" d="M12 0c.9 7.9 3.2 11.1 12 12-8.8.9-11.1 4.1-12 12-.9-7.9-3.2-11.1-12-12 8.8-.9 11.1-4.1 12-12Z"/>
+    <!-- handle, binding, flared skirt, two bristles — reads as a broom at
+         21px, which the previous angled version did not -->
+    <g id="i-broom" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v7.4"/>
+      <path d="M8.8 10.4h6.4l1.5 8.8H7.3z"/>
+      <path d="M8.5 13.2h7"/>
+      <path d="M10.8 13.4v5.8"/>
+      <path d="M13.2 13.4v5.8"/>
+    </g>
+    <g id="i-shuffle" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h3.6a4 4 0 0 1 3.3 1.8l4.2 6.4A4 4 0 0 0 17.4 16H21"/>
+      <path d="M3 18h3.6a4 4 0 0 0 3.3-1.8l.9-1.4"/>
+      <path d="m13.8 8.6.9-1.4A4 4 0 0 1 18 5.4h3"/>
+      <path d="m18 3 3 2.4L18 8"/>
+      <path d="m18 13.6 3 2.4L18 18.4"/>
+    </g>
+    <g id="i-pencil" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14.3 3.9a1.7 1.7 0 0 1 2.4 2.4L7.4 15.6l-3.2.8.8-3.2Z"/>
+    </g>
+    <g id="i-pencil-lg" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16.5 3.4a2.2 2.2 0 0 1 3.1 3.1L8.4 17.7l-4.2 1.1 1.1-4.2Z"/>
+      <path d="m14.6 5.3 3.1 3.1"/>
+    </g>
+    <g id="i-deck" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="4" width="11" height="15" rx="2"/>
+      <path d="M6.5 6.5A2 2 0 0 0 5 8.4v8.9a2 2 0 0 0 1.4 1.9l4 1.2"/>
+      <path d="M14.5 9.4v4.2M12.4 11.5h4.2"/>
+    </g>
+  </defs>
+</svg>
+
+<header class="masthead">
+  <span class="masthead__mark">ArcanaTarot</span>
+  <button class="sound" id="btnSound" type="button" aria-pressed="true"
+          aria-label="Sound">
+    <svg class="sound__icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 9.5h3.2L12 5.4v13.2L7.2 14.5H4z" fill="currentColor"/>
+      <g class="sound__waves" fill="none" stroke="currentColor"
+         stroke-width="1.7" stroke-linecap="round">
+        <path d="M15.6 9.4a3.6 3.6 0 0 1 0 5.2"/>
+        <path d="M18.2 6.9a7.2 7.2 0 0 1 0 10.2"/>
+      </g>
+      <path class="sound__slash" d="M4.5 19.5 19.5 4.5" fill="none"
+            stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+    <span class="sound__label">Sound</span>
+  </button>
+</header>
+
+<!-- ─── the room ───────────────────────────────────────────────── -->
+<main class="room" id="room">
+
+  <!-- every command lives on the rail; nothing floats over the table -->
+  <aside class="rail" id="rail" aria-label="Room commands">
+    <button class="rail__cmd" id="btnRename" type="button">
+      <svg class="rail__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pencil-lg"/></svg>
+      <span>Your question</span>
+    </button>
+    <button class="rail__cmd" id="btnDeck" type="button">
+      <svg class="rail__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-deck"/></svg>
+      <span>Change deck</span>
+    </button>
+    <button class="rail__cmd" id="btnCleanUp" type="button">
+      <svg class="rail__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-broom"/></svg>
+      <span>Clean up cards</span>
+    </button>
+    <button class="rail__cmd" id="btnRestart" type="button">
+      <svg class="rail__icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shuffle"/></svg>
+      <span>Restart the room</span>
+    </button>
+  </aside>
+
+  <!-- the rotating seal: rendered only once all three cards are revealed -->
+  <button class="seal" id="seal" type="button" hidden aria-label="Summarize the cards">
+    <svg class="seal__svg" viewBox="0 0 213 213" aria-hidden="true">
+      <defs>
+        <path id="sealArc" d="M106.5 24.5a82 82 0 1 1-.01 0" fill="none"/>
+      </defs>
+      <circle cx="106.5" cy="106.5" r="106.5" fill="var(--ink)"/>
+      <!-- the deck's own eye, held upright while the ring turns -->
+      <image class="seal__eye" href="assets/seal-eye.png" x="41.5" y="68"
+             width="130" height="75" preserveAspectRatio="xMidYMid meet"/>
+      <g class="seal__ring">
+        <text class="seal__text">
+          <textPath href="#sealArc" startOffset="0">summarize the cards, summarize the cards,&#160;</textPath>
+        </text>
+      </g>
+    </svg>
+    <span class="seal__cue">Press to read your spread</span>
+  </button>
+
+  <h1 class="question" id="questionRow">
+    <span class="question__text" id="questionText"></span>
+    <button class="question__edit" id="btnRenameInline" type="button" aria-label="Rename my question">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><use href="#i-pencil"/></svg>
+    </button>
+  </h1>
+
+  <!-- ── stage: the way in ────────────────────────────────────── -->
+  <section class="stage stage--intro" id="stageIntro" hidden>
+    <h2 class="intro__ask">What do you need guidance with?</h2>
+    <!-- six backs dealt into an arc; each slot carries its own angle and
+         its own place in the stagger -->
+    <div class="intro__fan" aria-hidden="true">
+      <div class="intro__slot" style="--a:-25deg; --i:0"><div class="intro__card"></div></div>
+      <div class="intro__slot" style="--a:-15deg; --i:1"><div class="intro__card"></div></div>
+      <div class="intro__slot" style="--a:-5deg;  --i:2"><div class="intro__card"></div></div>
+      <div class="intro__slot" style="--a:5deg;   --i:3"><div class="intro__card"></div></div>
+      <div class="intro__slot" style="--a:15deg;  --i:4"><div class="intro__card"></div></div>
+      <div class="intro__slot" style="--a:25deg;  --i:5"><div class="intro__card"></div></div>
+    </div>
+    <button class="slab intro__go" id="btnStart" type="button">Start your reading</button>
+  </section>
+
+  <!-- ── stage: shuffling ─────────────────────────────────────── -->
+  <section class="stage stage--shuffle" id="stageShuffle" hidden>
+    <!-- a real deck: many stacked leaves reading as one block of thickness -->
+    <div class="deck" id="deck" aria-hidden="true">
+      <div class="deck__stack" id="deckStack"></div>
+      <div class="deck__shadow"></div>
+    </div>
+    <p class="deck__count" id="deckCount">22 cards, face down</p>
+    <div class="riffle__actions">
+      <button class="slab" id="btnReadyShuffle" type="button">Ready to shuffle</button>
+      <button class="slab" id="btnDoneShuffle" type="button">Done Shuffling</button>
+    </div>
+  </section>
+
+  <!-- ── stage: the desk ──────────────────────────────────────── -->
+  <section class="stage stage--desk" id="stageDesk" hidden>
+    <div class="slots" id="slots"></div>
+    <div class="desk__says" id="deskSays">
+      <p class="desk__lead" id="deskLead">Place your cards</p>
+      <p class="desk__hint" id="deskHint">Drag your cards to your desk</p>
+    </div>
+    <p class="fan__count" id="fanCount"></p>
+    <div class="fan__rail">
+      <div class="fan" id="fan" role="group" aria-label="The deck"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ─── modals ─────────────────────────────────────────────────── -->
+
+<div class="scrim" id="scrimAsk" hidden>
+  <div class="modal modal--ask" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="askTitle">
+    <button class="modal__x" data-close="scrimAsk" type="button" aria-label="Close">&times;</button>
+    <h2 class="modal__title" id="askTitle">What do you want to ask?</h2>
+    <form id="askForm" novalidate>
+      <!-- only on a first ask; afterwards the spread lives on "Change deck" -->
+      <fieldset class="spreads" id="spreadsField">
+        <legend class="field__cap">How should the cards answer?</legend>
+        <div class="spreads__grid" id="spreadPick"></div>
+      </fieldset>
+      <label class="field">
+        <input class="field__input" id="fQuestion" type="text" maxlength="140"
+               autocomplete="off" placeholder="What will my job look like five years from now?">
+        <span class="field__err" id="eQuestion"></span>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span class="field__cap">Your birth date</span>
+          <input class="field__input" id="fBirth" type="date">
+          <span class="field__err" id="eBirth"></span>
+        </label>
+        <label class="field">
+          <span class="field__cap">Year in focus</span>
+          <input class="field__input" id="fYear" type="number" min="1900" max="2200" inputmode="numeric">
+          <span class="field__err" id="eYear"></span>
+        </label>
+      </div>
+      <button class="slab slab--wide" id="btnAskGo" type="submit">Rename my question</button>
+    </form>
+  </div>
+</div>
+
+<div class="scrim" id="scrimDeck" hidden>
+  <div class="modal modal--ask" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="deckTitle">
+    <button class="modal__x" data-close="scrimDeck" type="button" aria-label="Close">&times;</button>
+    <h2 class="modal__title" id="deckTitle">Change deck</h2>
+    <p class="modal__sub">How many cards should answer, and what each one means.</p>
+    <div class="spreads__grid" id="deckPick"></div>
+  </div>
+</div>
+
+<div class="scrim" id="scrimWipe" hidden>
+  <div class="modal modal--wipe" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="wipeTitle">
+    <button class="modal__x" data-close="scrimWipe" type="button" aria-label="Close">&times;</button>
+    <h2 class="modal__title modal__title--sm" id="wipeTitle">Are you sure you want to clean up<br>and restart the deck?</h2>
+    <button class="slab" id="btnWipeYes" type="button">Yep, I'm sure</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrimSum" hidden>
+  <div class="modal modal--sum" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="sumTitle">
+    <button class="modal__x" data-close="scrimSum" type="button" aria-label="Close">&times;</button>
+    <h2 class="modal__title" id="sumTitle">Your card</h2>
+    <div class="sum" id="sumBody"></div>
+  </div>
+</div>
+
+<div class="sr-only" id="live" role="status" aria-live="polite"></div>
+
+<script src="audio.js"></script>
+<script src="cards.js"></script>
+<script src="oracle.js"></script>
+<script src="spread.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

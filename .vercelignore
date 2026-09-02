@@ -1,0 +1,9 @@
+# Dev-only server — Vercel serves the static files itself
+serve.py
+
+# The previous single-card build, kept in git but not shipped
+legacy/
+
+# Local tooling
+.claude/
+.impeccable/

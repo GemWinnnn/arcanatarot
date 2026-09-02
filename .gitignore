@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# local tool state, not project config
+.impeccable/
+.claude/settings.local.json

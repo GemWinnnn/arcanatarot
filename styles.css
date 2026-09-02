@@ -1,0 +1,1028 @@
+/* ===================================================================
+   Critters Tarot — three card spread
+   Built from the Figma file "critters" (node 165:2321).
+
+   THESIS: a white desk, black line-work, and the cards doing all the
+   talking. Nothing glows, nothing gradients. The only moving thing on
+   a settled table is the seal, and it only exists once the spread is
+   complete.
+   =================================================================== */
+
+:root {
+  --ink:        #231f1c;
+  --ink-soft:   #6b6560;
+  --ink-faint:  #a8a29c;
+  --paper:      #ffffff;
+  --line:       #1a1a1a;
+  --hair:       #d9d5d0;
+  --scrim:      rgba(122, 120, 117, .72);
+
+  --card-w:     clamp(132px, 15.86vw, 274px);
+  --card-h:     calc(var(--card-w) * 447 / 274);
+  --slot-gap:   clamp(18px, 3.53vw, 61px);
+
+  --back:       url("assets/card-back-eye.png");   /* the deck's face-down art */
+  --head-h:     90px;
+  --rail-w:     212px;
+
+  --ease:       cubic-bezier(.22, 1, .36, 1);
+  --serif:      "Playfair Display", Georgia, serif;
+  --sans:       "Poppins", "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body { overflow-x: hidden; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+button { font: inherit; color: inherit; cursor: pointer; }
+
+/* ─── masthead ─────────────────────────────────────────────────── */
+
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  height: var(--head-h);
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  border-bottom: 1px solid var(--hair);
+}
+
+/* the one control that lives above the room */
+.sound {
+  position: absolute;
+  right: clamp(14px, 1.6vw, 26px);
+  top: 50%;
+  translate: 0 -50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  color: var(--ink-soft);
+  transition: background .16s var(--ease), color .16s var(--ease);
+}
+
+.sound:hover { background: rgba(35, 31, 28, .05); color: var(--ink); }
+.sound__icon { width: 20px; height: 20px; }
+.sound__label { font-size: 12.5px; }
+
+/* the waves belong to "on", the slash to "off" */
+.sound__slash { opacity: 0; transition: opacity .2s var(--ease); }
+.sound__waves { transition: opacity .2s var(--ease); }
+.sound[aria-pressed="false"] .sound__waves { opacity: 0; }
+.sound[aria-pressed="false"] .sound__slash { opacity: 1; }
+
+.masthead__mark {
+  font-family: var(--serif);
+  font-size: clamp(17px, 1.35vw, 22px);
+  letter-spacing: .01em;
+}
+
+/* ─── the room ─────────────────────────────────────────────────── */
+
+.room {
+  position: relative;
+  max-width: 1728px;
+  min-height: calc(100svh - var(--head-h));
+  margin: 0 auto;
+  /* the rail floats over the corner rather than reserving a column, so the
+     table stays centred on the page exactly as the Figma frames have it */
+  padding: clamp(20px, 3vw, 34px) clamp(16px, 2.5vw, 44px) 0;
+  overflow: hidden;
+}
+
+/* ─── the command rail ─────────────────────────────────────────── */
+
+.rail {
+  position: absolute;
+  top: clamp(20px, 3vw, 34px);
+  right: clamp(14px, 1.6vw, 26px);
+  width: var(--rail-w);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 40;
+}
+
+.rail__cmd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  text-align: left;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  transition: background .16s var(--ease), color .16s var(--ease);
+}
+
+.rail__cmd:hover  { background: rgba(35, 31, 28, .05); color: var(--ink); }
+.rail__cmd:active { background: rgba(35, 31, 28, .09); }
+
+.rail__cmd:disabled {
+  opacity: .3;
+  pointer-events: none;
+}
+
+.rail__icon { width: 21px; height: 21px; flex: none; }
+
+/* .rail sets a display, which outranks the UA's [hidden] rule — restate it */
+.rail[hidden] { display: none; }
+
+/* ─── the question ─────────────────────────────────────────────── */
+
+.question {
+  position: relative;
+  z-index: 10;
+  text-wrap: balance;
+  margin: clamp(74px, 9vw, 132px) auto clamp(28px, 4vw, 56px);
+  max-width: 760px;
+  padding: 0 46px;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: clamp(21px, 1.9vw, 32px);
+  font-weight: 400;
+  line-height: 1.28;
+}
+
+/* the shuffle stage is tall; it does not need the desk's headline gap */
+.room:has(#stageShuffle:not([hidden])) .question {
+  margin-top: clamp(34px, 4vw, 64px);
+  margin-bottom: clamp(20px, 2.4vw, 34px);
+}
+
+/* flows inline rather than absolutely — an absolute box takes its static
+   position from wherever the inline run happens to end, which lands it on
+   top of the text as soon as the question wraps */
+.question__edit {
+  margin-left: 10px;
+  translate: 0 -.45em;
+  width: 26px; height: 26px;
+  display: inline-grid;
+  vertical-align: middle;
+  place-items: center;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+
+.question__edit svg { width: 11px; height: 11px; }
+.question__edit:hover { background: var(--ink); color: var(--paper); }
+.question__edit:disabled { opacity: .3; pointer-events: none; }
+
+/* ─── the rotating seal ────────────────────────────────────────── */
+
+.seal {
+  position: absolute;
+  left: clamp(16px, 6.5vw, 113px);
+  top: clamp(96px, 14vw, 157px);
+  width: clamp(104px, 12.3vw, 213px);
+  aspect-ratio: 1;
+  padding: 0;
+  background: none;
+  border: 0;
+  z-index: 20;
+  animation: sealIn .5s var(--ease) both;
+  transition: transform .3s var(--ease);
+}
+
+/* a class-level `display` beats the UA's [hidden] rule, and the responsive
+   block below sets one — so restate the hide at equal specificity or the
+   seal leaks onto every stage on small screens */
+.seal[hidden] { display: none; }
+
+.seal__svg { width: 100%; height: 100%; display: block; }
+
+/* the artwork is gold foil; brightness(0) flattens it to black and
+   invert(1) lifts it to white, leaving the alpha channel untouched */
+.seal__eye { filter: brightness(0) invert(1); }
+
+/* a ring that breathes out of the seal a few times when it first appears,
+   then stops — enough to catch the eye, not enough to nag */
+.seal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  animation: sealPulse 2.1s var(--ease) 4;
+  animation-delay: .5s;
+  pointer-events: none;
+}
+
+@keyframes sealPulse {
+  0%   { opacity: .5; scale: 1; }
+  70%  { opacity: 0;  scale: 1.28; }
+  100% { opacity: 0;  scale: 1.28; }
+}
+
+/* the instruction sits under the disc and says what to do, since the
+   ring text names the action but never asks for the press */
+.seal__cue {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: 15ch;
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: center;
+  animation: riseIn .5s var(--ease) both;
+  animation-delay: .45s;
+  transition: color .2s var(--ease);
+}
+
+.seal:hover .seal__cue { color: var(--ink); }
+
+/* only the lettering turns — the eye is drawn separately and stays put */
+.seal__ring {
+  transform-origin: 106.5px 106.5px;
+  animation: spin 20s linear infinite;
+}
+
+.seal:hover { transform: scale(1.05); }
+.seal:hover .seal__ring { animation-duration: 8s; }
+
+.seal__text {
+  fill: var(--paper);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: .26em;
+}
+
+@keyframes spin   { to { transform: rotate(360deg); } }
+@keyframes sealIn { from { opacity: 0; transform: scale(.85); } }
+
+/* ─── stages ───────────────────────────────────────────────────── */
+
+.stage[hidden] { display: none; }
+
+.stage--desk,
+.stage--shuffle { animation: stageIn .45s var(--ease) both; }
+@keyframes stageIn { from { opacity: 0; } }
+
+/* ─── stage: the way in ────────────────────────────────────────── */
+
+.stage--intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: clamp(18px, 3.4vw, 54px);
+}
+
+.intro__ask {
+  margin: 0 0 clamp(20px, 2.6vw, 34px);
+  max-width: 20ch;
+  text-align: center;
+  text-wrap: balance;
+  font-family: var(--serif);
+  font-size: clamp(30px, 3.8vw, 52px);
+  font-weight: 400;
+  line-height: 1.14;
+}
+
+/* Six backs held in a hand.
+   Two layers on purpose: the SLOT owns the fan angle (and the deal-in),
+   the CARD owns the idle drift and the hover. Keeping them apart means
+   the breathing never fights the fan, and hovering never stops either. */
+
+.intro__ask,
+.intro__go { animation: riseIn .6s var(--ease) both; }
+.intro__ask { animation-delay: .05s; }
+.intro__go  { animation-delay: .62s; }
+
+@keyframes riseIn { from { opacity: 0; translate: 0 14px; } }
+
+.intro__fan {
+  position: relative;
+  width: calc(var(--card-w) * 2.75);
+  height: calc(var(--card-h) * 1.16);
+  margin-bottom: clamp(20px, 2.8vw, 40px);
+}
+
+.intro__slot {
+  position: absolute;
+  inset: 0;
+  /* the pivot sits below the cards, so one rotation gives the whole arc */
+  transform-origin: 50% 152%;
+  rotate: var(--a);
+  z-index: calc(10 - var(--i));
+  pointer-events: none;
+  transition: rotate .6s var(--ease);
+  animation: dealIn .8s var(--ease) both;
+  animation-delay: calc(var(--i) * .09s + .12s);
+}
+
+@keyframes dealIn {
+  from { opacity: 0; rotate: 0deg; translate: 0 44px; }
+}
+
+.intro__card {
+  position: absolute;
+  top: 0; left: 50%;
+  width: calc(var(--card-w) * .84);
+  height: calc(var(--card-h) * .84);
+  margin-left: calc(var(--card-w) * -.42);
+  border-radius: 11px;
+  background: var(--paper) var(--back) center/cover no-repeat;
+  border: 1px solid rgba(35, 31, 28, .18);
+  box-shadow: 0 6px 20px rgba(0,0,0,.09);
+  /* the hand is looked at, not handled — no hover on the homepage */
+  pointer-events: none;
+  /* a slow, offset drift — alive but not fidgeting */
+  animation: drift 6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -.95s);
+}
+
+@keyframes drift {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -8px; }
+}
+
+/* ─── stage: shuffling ─────────────────────────────────────────── */
+
+.stage--shuffle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: clamp(48px, 8vw, 110px);
+}
+
+/* ─── the deck ─────────────────────────────────────────────────────
+   Twenty leaves stacked leaf-on-leaf. Each is a full card back, but
+   only the top one is fully visible — the rest read as the edge of a
+   block, which is what gives the deck its thickness.                 */
+
+/* the deck sits a little smaller than a laid card, so the whole stage —
+   question, deck, count, both buttons — clears the fold with room under it */
+.deck {
+  --deck-w: calc(var(--card-w) * .82);
+  --deck-h: calc(var(--card-h) * .82);
+  position: relative;
+  width: var(--deck-w);
+  height: calc(var(--deck-h) + 22px);
+  margin: 0 auto clamp(12px, 1.6vw, 20px);
+}
+
+.deck__stack { position: absolute; inset: 0; }
+
+.leaf {
+  position: absolute;
+  left: 0; bottom: 0;
+  width: var(--deck-w);
+  height: var(--deck-h);
+  border-radius: 10px;
+  background: var(--paper) var(--back) center/cover no-repeat;
+  border: 1px solid rgba(35, 31, 28, .16);
+  box-shadow: 0 1px 0 rgba(0,0,0,.05);
+  transition: transform .34s var(--ease);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* At rest the buried leaves only ever show a sliver, so the art on them
+   is wasted ink — flatten them to paper and keep the edge line. The
+   moment the deck splits they become whole cards in their own right,
+   so the backs come back for the length of the shuffle. */
+.leaf:not(.leaf--top) { background-image: none; }
+
+.leaf--top { box-shadow: 0 10px 24px rgba(0,0,0,.13); }
+
+.deck__stack.is-shuffling .leaf {
+  transition-duration: .3s;
+  background-image: var(--back);
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
+}
+
+.deck__shadow {
+  position: absolute;
+  left: 6%; right: 6%; bottom: -6px;
+  height: 16px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,.16), transparent 70%);
+  filter: blur(3px);
+}
+
+.deck__count {
+  margin: 0 0 clamp(22px, 3.4vw, 42px);
+  text-align: center;
+  font-size: 11.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.riffle__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  width: 247px;
+}
+
+.slab {
+  height: 51px;
+  padding: 0 20px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-size: 16px;
+  transition: background .18s var(--ease), color .18s var(--ease), opacity .18s;
+}
+
+.slab:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+.slab:disabled { opacity: .32; cursor: default; }
+.slab--wide { width: 100%; margin-top: 26px; }
+
+/* ─── stage: the desk ──────────────────────────────────────────── */
+
+.slots {
+  display: flex;
+  justify-content: center;
+  gap: var(--slot-gap);
+}
+
+.slot {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  transition: border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease);
+}
+
+.slot.is-over {
+  border-color: var(--line);
+  background: rgba(35, 31, 28, .04);
+  transform: scale(1.02);
+}
+
+.slot.is-filled { border-color: transparent; }
+
+.desk__lead,
+.desk__hint {
+  margin: 0;
+  text-align: center;
+  font-family: var(--serif);
+  color: var(--ink-faint);
+  font-size: clamp(13px, 1.05vw, 17px);
+}
+
+/* the desk stops talking once every card is down */
+.desk__says {
+  margin-top: clamp(22px, 3.2vw, 51px);
+  transition: opacity .5s var(--ease), transform .5s var(--ease);
+}
+
+.desk__says.is-gone {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+.desk__lead { margin-top: 0; }
+
+.desk__hint {
+  margin-top: 10px;
+  transition: opacity .45s var(--ease);
+}
+
+.desk__hint.is-fading { opacity: 0; }
+
+/* ─── the fan ──────────────────────────────────────────────────── */
+
+.fan__count {
+  margin: clamp(16px, 2.6vw, 38px) 0 8px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* The rail scrolls; the fan inside it is as wide as the spread needs.
+   overflow-x:auto forces the other axis to compute to auto as well, so a
+   hovered card lifting out of the box gets its head cut off. The padding
+   gives that lift somewhere to live inside the scroll box, and the equal
+   negative margin keeps the layout where it was. */
+.fan__rail {
+  --lift-room: 58px;
+  padding-top: var(--lift-room);
+  margin-top: calc(var(--lift-room) * -1);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+
+.fan {
+  position: relative;
+  height: calc(var(--card-h) * .62);
+  touch-action: pan-y;
+}
+
+/* ─── a card ───────────────────────────────────────────────────── */
+
+.card {
+  position: absolute;
+  top: 0; left: 0;
+  width: var(--card-w);
+  height: var(--card-h);
+  perspective: 1200px;
+  will-change: transform;
+  transition: transform .38s var(--ease), filter .2s var(--ease);
+}
+
+.card--fan       { cursor: grab; }
+.card--fan:active{ cursor: grabbing; }
+
+.card--fan:hover:not(.is-dragging) { z-index: 40 !important; }
+
+.card__inner {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .6s var(--ease);
+  border-radius: 10px;
+}
+
+.card.is-faceup .card__inner { transform: rotateY(180deg); }
+
+.card__face,
+.card__back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 10px;
+  background: var(--paper) center/cover no-repeat;
+  box-shadow: 0 2px 14px rgba(0,0,0,.10);
+}
+
+.card__back { background-image: var(--back); }
+.card__face { transform: rotateY(180deg); }
+
+/* a reversed draw hangs upside down, as the deck intends */
+.card.is-reversed .card__face { transform: rotateY(180deg) rotate(180deg); }
+
+/* lift through the flip, then settle */
+.card.is-flipping { animation: lift .6s var(--ease); }
+@keyframes lift {
+  40% { transform: translateY(-14px) scale(1.03); }
+}
+
+.card.is-dragging {
+  position: fixed;
+  z-index: 90;
+  cursor: grabbing;
+  transition: none;
+  filter: drop-shadow(0 18px 26px rgba(0,0,0,.22));
+}
+
+.card.is-dragging .card__inner { transform: scale(1.05); }
+
+.card.is-placed  { cursor: pointer; }
+.card.is-locked  { cursor: default; }
+
+/* hover on a face-down placed card: lift, and name the gesture */
+.card.is-placed:not(.is-faceup):hover .card__inner { transform: translateY(-8px); }
+.card.is-placed:not(.is-faceup):hover .card__back  { box-shadow: 0 12px 26px rgba(0,0,0,.18); }
+
+.card__flip {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 7px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 2px;
+  font-size: 13px;
+  letter-spacing: .12em;
+  text-transform: lowercase;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s var(--ease);
+  z-index: 5;
+}
+
+.card.is-placed:not(.is-faceup):not(.is-locked):hover .card__flip { opacity: 1; }
+
+/* ─── modals ───────────────────────────────────────────────────── */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  /* flex + auto margins, not place-items:center — a centred grid child
+     taller than the scrim gets its top clipped and cannot be scrolled to */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+  background: var(--scrim);
+  animation: fade .22s var(--ease);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.scrim[hidden] { display: none; }
+@keyframes fade { from { opacity: 0; } }
+
+/* the dialog can take focus so a modal with no text field still traps the
+   keyboard, but it is not a control and should not draw a ring */
+.modal:focus { outline: none; }
+
+.modal {
+  position: relative;
+  width: 100%;
+  margin: auto;             /* centres when short, scrolls when tall */
+  background: var(--paper);
+  border-radius: 18px;
+  padding: 40px clamp(24px, 4vw, 56px) 46px;
+  animation: rise .3s var(--ease);
+  box-shadow: 0 24px 60px rgba(0,0,0,.18);
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+
+.modal--ask  { max-width: 470px; text-align: center; }
+.modal--wipe { max-width: 470px; text-align: center; }
+.modal--sum  { max-width: 1030px; margin: auto; }
+
+.modal__x {
+  position: absolute;
+  top: 18px; right: 20px;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ink);
+  border-radius: 50%;
+  transition: background .18s;
+}
+
+.modal__x:hover { background: rgba(0,0,0,.06); }
+
+.modal__title {
+  margin: 0 0 26px;
+  font-family: var(--sans);
+  font-size: clamp(19px, 1.6vw, 26px);
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+
+.modal__title--sm { font-size: clamp(16px, 1.25vw, 20px); line-height: 1.45; }
+
+.modal__sub {
+  margin: -18px 0 22px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+/* ─── form fields ──────────────────────────────────────────────── */
+
+/* ─── spread picker ────────────────────────────────────────────── */
+
+/* guard the hide, as with .rail and .seal — a class-level display would
+   otherwise outrank the UA's [hidden] rule */
+.spreads[hidden] { display: none; }
+
+.spreads {
+  margin: 0 0 24px;
+  padding: 0;
+  border: 0;
+  text-align: left;
+}
+
+.spreads__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.spread {
+  position: relative;
+  display: block;
+  padding: 12px 13px 11px;
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color .18s var(--ease), background .18s var(--ease);
+}
+
+.spread input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spread:hover { border-color: var(--ink-faint); }
+
+.spread.is-on {
+  border-color: var(--line);
+  background: rgba(35, 31, 28, .04);
+}
+
+.spread:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.spread__n {
+  display: block;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.spread__b {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ink-faint);
+}
+
+.spread__c {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.spread.is-on .spread__c { color: var(--ink-soft); }
+
+.field { display: block; text-align: left; margin-bottom: 18px; }
+
+.field__cap {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.field__input {
+  width: 100%;
+  padding: 8px 2px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--hair);
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--ink);
+  transition: border-color .2s;
+}
+
+.field__input:focus {
+  outline: none;
+  border-bottom-color: var(--line);
+}
+
+.field__input::placeholder { color: var(--ink-faint); }
+.field.is-bad .field__input { border-bottom-color: #b0453a; }
+
+.field__err {
+  display: block;
+  min-height: 15px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: #b0453a;
+}
+
+.field-row { display: flex; gap: 20px; }
+.field-row .field { flex: 1; }
+
+/* ─── the summary ──────────────────────────────────────────────── */
+
+.sum__q {
+  margin: -8px 0 30px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(16px, 1.35vw, 21px);
+  line-height: 1.4;
+}
+
+.sum__meta {
+  margin: -22px 0 32px;
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: var(--ink-faint);
+}
+
+/* the yes/no spread has to actually say the word */
+.sum__verdict {
+  margin: 0 0 30px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--hair);
+}
+
+.sum__verdict span {
+  font-family: var(--serif);
+  font-size: clamp(44px, 5.4vw, 78px);
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+
+.sum__card {
+  display: grid;
+  grid-template-columns: minmax(0, 244px) minmax(0, 1fr);
+  gap: clamp(22px, 3vw, 48px);
+  padding: 30px 0;
+  border-top: 1px solid var(--hair);
+}
+
+.sum__art {
+  width: 100%;
+  border-radius: 6px;
+  box-shadow: 0 2px 14px rgba(0,0,0,.12);
+}
+
+.sum__art--rev { transform: rotate(180deg); }
+
+.sum__name {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(19px, 1.6vw, 25px);
+  font-weight: 400;
+}
+
+.sum__orient {
+  margin: 4px 0 14px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.sum__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.sum__keys li {
+  padding: 7px 16px;
+  background: #ececec;
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.sum__detail { margin: 0; font-size: 14.5px; line-height: 1.62; color: var(--ink-soft); }
+
+.sum__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px clamp(24px, 4vw, 60px);
+  margin-top: 26px;
+}
+
+.sum__h {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-size: clamp(15px, 1.2vw, 19px);
+  font-weight: 400;
+}
+
+.sum__p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+
+.sum__close {
+  padding-top: 34px;
+  border-top: 1px solid var(--hair);
+}
+
+.sum__close .sum__grid { margin-top: 0; }
+
+.sum__after {
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid var(--hair);
+  text-align: center;
+}
+
+.sum__locked {
+  margin: 0 0 18px;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+}
+
+.sum__acts {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sum__acts .slab { padding: 0 26px; }
+
+/* ─── responsive ───────────────────────────────────────────────── */
+
+@media (max-width: 1199px) {
+  :root { --head-h: 62px; }
+
+  .room { padding: 16px 16px 0; }
+
+  /* the rail becomes a row of icons above the table — static, because
+     sticky inside the room's overflow:hidden box does not contain cleanly */
+  .rail {
+    position: static;
+    width: auto;
+    margin: 0 0 clamp(12px, 3vw, 22px);
+    flex-direction: row;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .sound__label { display: none; }
+  .sound { padding: 8px; }
+
+  .rail__cmd { width: auto; padding: 9px 11px; }
+  .rail__cmd span { display: none; }
+
+  .seal {
+    position: static;
+    display: block;
+    margin: 0 auto 42px;
+    width: 118px;
+  }
+
+  .seal__cue { font-size: 10px; max-width: 18ch; }
+
+  .question { margin-top: 10px; font-size: 20px; }
+
+  .slots { flex-direction: column; align-items: center; gap: 20px; }
+
+  .fan { height: calc(var(--card-h) * .72); }
+  .fan__rail { -webkit-overflow-scrolling: touch; }
+
+  .sum__card  { grid-template-columns: 1fr; }
+  .sum__art   { max-width: 220px; }
+  .sum__grid  { grid-template-columns: 1fr; }
+  .field-row  { flex-direction: column; gap: 0; }
+
+  .deck { --deck-w: calc(var(--card-w) * .74); --deck-h: calc(var(--card-h) * .74); }
+
+  .intro__ask { font-size: clamp(25px, 7vw, 34px); }
+
+  /* smaller cards on a phone, but keep the arc open enough that six still
+     read as six rather than one card with slivers behind it */
+  .intro__fan  { width: calc(var(--card-w) * 2.35); height: calc(var(--card-h) * .98); }
+  .intro__slot { transform-origin: 50% 138%; rotate: calc(var(--a) * .92); }
+  .intro__card { width: calc(var(--card-w) * .68); height: calc(var(--card-h) * .68);
+                 margin-left: calc(var(--card-w) * -.34); }
+}
+
+@media (max-width: 430px) {
+  .spreads__grid { grid-template-columns: 1fr; }
+}
+
+/* ─── reduced motion ───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .seal__ring { animation: none; }
+  .seal:hover .seal__ring { animation: none; }
+  .card__inner { transition-duration: .2s; }
+  .card.is-flipping { animation: none; }
+  .leaf { transition-duration: .01s; }
+  .stage--desk, .stage--shuffle, .modal, .scrim, .seal { animation: none; }
+
+  /* the hand still fans, it just stops breathing and dealing itself in */
+  .intro__card { animation: none; }
+  .intro__slot { animation: none; transition: none; }
+  .intro__ask, .intro__go { animation: none; }
+  .seal::after { animation: none; opacity: 0; }
+  .seal__cue { animation: none; }
+}
