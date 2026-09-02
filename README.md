@@ -99,6 +99,21 @@ stops when you go back to the door.
 
 The switch in the masthead silences everything and is remembered across visits.
 
+## Deploying
+
+Static: no build step, no install command. On Vercel, pick framework preset
+**Other** and leave the build, output and install fields empty.
+
+`vercel.json` sets the cache policy — assets for a week, but HTML, CSS and JS
+as `must-revalidate`. That second rule matters: a browser holding a stale
+`app.js` after a redeploy throws errors against line numbers that no longer
+exist in the file, which is the exact failure this project hit in development
+(and why `serve.py` sends `no-store` locally). Note that `vercel.json` is
+strict JSON — Vercel rejects unknown keys, so it cannot carry comments.
+
+`.vercelignore` keeps `serve.py`, `legacy/` and the legacy-only artwork out of
+the upload, taking the payload from ~10MB to ~6.6MB.
+
 ## Files
 
 | File | Role |
